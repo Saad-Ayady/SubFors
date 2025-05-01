@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"subfors/core"
-	"subfors/banner"
-	"subfors/output"
+	"github.com/saad-ayady/SubFors/banner"
+	"github.com/saad-ayady/SubFors/core" 
+	"github.com/saad-ayady/SubFors/output"
 	"sync"
 	"time"
 )
