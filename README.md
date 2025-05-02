@@ -24,7 +24,7 @@
 ### From Source
 
 ```bash
-git clone https://github.com/0xS22d/SubFors
+git clone https://github.com/saad-ayady/SubFors
 
 cd SubFors
 
@@ -36,7 +36,7 @@ sudo mv subfors /usr/local/bin/
 ## Using Go 
 
 ```bash 
-go install github.com/saad-ayady/SubFors@latest
+go install github.com/saad-ayady/SubFors/cmd/subfors@latest
 ```
 
 # Usage 🛠️ 
