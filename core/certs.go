@@ -31,7 +31,7 @@ func GetSubsFromCRT(domain string) ([]string, error) {
 
 	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("خطأ في إنشاء الطلب: %v", err)
+		return nil, fmt.Errorf("error in create req  %v", err)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 	req.Header.Set("Accept", "application/json")
@@ -45,27 +45,27 @@ func GetSubsFromCRT(domain string) ([]string, error) {
 		time.Sleep(time.Duration(attempt+1) * time.Second)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("فشل في الاتصال بـ crt.sh: %v", err)
+		return nil, fmt.Errorf("error in connect with crf.sh: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("الاستجابة غير الناجحة من crt.sh: %d", resp.StatusCode)
+		return nil, fmt.Errorf("error in responsing from crf.sh: %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("خطأ في قراءة الاستجابة: %v", err)
+		return nil, fmt.Errorf("error in reading respons :  %v", err)
 	}
 
 	// التحقق من وجود CAPTCHA
 	if strings.Contains(string(body), "captcha") {
-		return nil, fmt.Errorf("تم اكتشاف CAPTCHA في الاستجابة")
+		return nil, fmt.Errorf("in response, Fond CAPTCHA, please try again later")
 	}
 
 	var data CRTResponse
 	if err := json.Unmarshal(body, &data); err != nil {
-		return nil, fmt.Errorf("خطأ في تحليل JSON: %v", err)
+		return nil, fmt.Errorf("Error in analyse JSON: %v", err)
 	}
 
 	var results []string
@@ -79,7 +79,6 @@ func GetSubsFromCRT(domain string) ([]string, error) {
 				continue
 			}
 
-			// إزالة الأحرف البرية
 			if strings.HasPrefix(name, "*.") {
 				name = strings.TrimPrefix(name, "*.")
 			}
