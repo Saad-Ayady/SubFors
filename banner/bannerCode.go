@@ -20,8 +20,9 @@ func PrintBanner() {  // Changed to uppercase to export the function
 \_______)(_______)|/ \___/ |/       (_______)|/   \__/\_______)
 ` + reset + "\n")
 
-	fmt.Printf(yellow+"Version:   "+green+"v0.1\n"+reset)
-	fmt.Printf(yellow+"Developer: "+green+"0xS22d\n"+reset)
-	fmt.Printf(yellow+"Website:   "+blue+"https://saad-ayady.github.io/myWEBSITE/\n\n"+reset)
+	fmt.Printf(yellow+"Version:      "+green+"v0.1\n"+reset)
+	fmt.Printf(yellow+"Developer:    "+green+"0xS22d\n"+reset)
+	fmt.Printf(yellow+"site of dev:  "+blue+"https://saad-ayady.github.io/myWEBSITE/\n"+reset)
+	fmt.Printf(yellow+"site of tool: "+blue+"https://saad-ayady.github.io/SubFors_WebSite/\n\n"+reset)
 	fmt.Println(yellow + "------------------------------------------------" + reset)
 }
