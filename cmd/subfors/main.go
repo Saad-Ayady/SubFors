@@ -44,6 +44,13 @@ func init() {
 		fmt.Println("\nAPI Modules:")
 		fmt.Println("  -vt string   VirusTotal API key (enables VT subdomain lookup)")
 		fmt.Println("  -dn string   DNSDumpster API key (enables DNSDumpster lookup)")
+		fmt.Println("\nScan Techniques:")
+		fmt.Println("  - Brute Force")
+		fmt.Println("  - Certificate Transparency")
+		fmt.Println("  - Web Archives")
+		fmt.Println("  - Favicon Hash Matching")
+		fmt.Println("  - Search Engine Dorking")
+		fmt.Println("  - JavaScript Analysis")
 		fmt.Println("\nExamples:")
 		fmt.Println("  Basic scan:")
 		fmt.Println("    subfors -d example.com -o results.txt")
@@ -92,15 +99,16 @@ func processDomain(domain string) {
 		{"Bing Dork", core.BingDork},
 		{"DuckDuckGo Dork", core.DuckDork},
 		{"Headers Analysis", core.GetSubsFromHeaders},
+		{"Favicon Matching", core.GetSubsFromFavicon},
 		{"VirusTotal", func(d string) ([]string, error) {
 			if vtAPIKey == "" {
-				return nil, nil // Skip if no API key
+				return nil, nil
 			}
 			return core.GetSubsFromVirusTotal(d, vtAPIKey)
 		}},
 		{"DNSDumpster", func(d string) ([]string, error) {
 			if dnAPIKey == "" {
-				return nil, nil // Skip if no API key
+				return nil, nil
 			}
 			return core.GetSubsFromDNSDumpster(d, dnAPIKey)
 		}},
@@ -126,7 +134,7 @@ func processDomain(domain string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
-	rateLimiter := time.Tick(500 * time.Millisecond) // 2 requests/sec
+	rateLimiter := time.Tick(500 * time.Millisecond)
 	
 	for _, engine := range searchers {
 		<-rateLimiter

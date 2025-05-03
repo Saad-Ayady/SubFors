@@ -1,16 +1,17 @@
-# SubFors 🔍
+# SubFors 
 
 ![SubFors Banner](./images/pic.png)
 
-**SubFors** is a fast, modular subdomain discovery tool that combines multiple enumeration techniques to uncover hidden attack surfaces.
+**SubFors** is a fast, modular subdomain discovery tool that combines multiple enumeration techniques to uncover hidden attack surfaces. Now with **API integrations** for enhanced reconnaissance.
 
 [![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org/dl/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+[![API Ready](https://img.shields.io/badge/API%20Integrations-VirusTotal%2FDNSDumpster-orange)]()
 
-## Features ✨
+## Features 
 
-- **Multi-engine enumeration** (Google, Bing, DuckDuckGo, etc.)
+- **Multi-engine enumeration** (11 discovery methods)
+- **API integrations** (VirusTotal, DNSDumpster)
 - **Certificate Transparency** monitoring
 - **Brute-force** with custom wordlists
 - **Web Archives** analysis
@@ -19,17 +20,13 @@
 - **Multiple output formats** (TXT/JSON/XML)
 - **Bulk domain processing**
 
-## Installation 📦
+## Installation 
 
 ### From Source
-
 ```bash
 git clone https://github.com/saad-ayady/SubFors
-
 cd SubFors
-
 go build -o subfors main.go
-
 sudo mv subfors /usr/local/bin/
 ```
 
@@ -39,7 +36,7 @@ sudo mv subfors /usr/local/bin/
 go install github.com/saad-ayady/SubFors/cmd/subfors@latest
 ```
 
-# Usage 🛠️ 
+# Usage 
 
 ## Basic Scan 
 
@@ -47,27 +44,44 @@ go install github.com/saad-ayady/SubFors/cmd/subfors@latest
 subfors -d example.com
 ```
 
-## Advanced Scan 
+## Advanced Scan with APIs
 
 ```bash 
 subfors -d example.com \
+  -vt YOUR_VIRUSTOTAL_API_KEY \
+  -dn YOUR_DNSDUMPSTER_API_KEY \
+  -oJ results.json
+
+subfors -dL Scope.txt \
+  -vt YOUR_VIRUSTOTAL_API_KEY \
+  -dn YOUR_DNSDUMPSTER_API_KEY \
+  -oJ results.json
+
+subfors -dL Scope.txt \
   -w custom_wordlist.txt \
-  -o results.txt \
+  -vt YOUR_VIRUSTOTAL_API_KEY \
+  -dn YOUR_DNSDUMPSTER_API_KEY \
+  -oJ results.json
+
+subfors -dL Scope.txt \
+  -w custom_wordlist.txt \
   -oJ results.json
 ```
 
 ## Bulk Scanning 
 
 ```bash 
-subfors -dL domains.txt -oJ all_results.json
+subfors -dL domains.txt -w custom_wordlist.txt -oX results.xml
 ```
 
-# Full Options 📋
+# Full Options 
 
 | Flag      | Description                       | Example               |
 |-----------|-----------------------------------|-----------------------|
 | `-d`      | Target domain                     | `-d example.com`      |
 | `-dL`     | File containing domains           | `-dL domains.txt`     |
+| `-vt`     | VirusTotal API key                | `-vt abc123def456`    |
+| `-dn`     | DNSDumpster API key               | `-dn xyz789uvw012`    |
 | `-w`      | Custom wordlist path              | `-w wordlist.txt`     |
 | `-o`      | Text output file                  | `-o results.txt`      |
 | `-oJ`     | JSON output file                  | `-oJ results.json`    |
@@ -75,33 +89,66 @@ subfors -dL domains.txt -oJ all_results.json
 | `-t`      | Threads (default: `10`)           | `-t 20`               |
 | `-timeout`| Timeout in seconds (default: `30`)| `-timeout 60`         |
 
-# Output Example 📄
+## API Modules Guide :
+<div>
+  <img src="https://img.shields.io/badge/API_Version-v3.0-0078ff?style=flat&logo=virustotal&logoColor=white" alt="VirusTotal API">
+</div>
+
+**VirusTotal Integration**
+  1. **Get your API key from [VirusTotal](https://www.virustotal.com/gui/home/upload)**
+  2. **Use with `-vt` flag:**
+```bash
+subfors -d target.com -vt YOUR_API_KEY
+```
+  . **Queries VirusTotal's subdomains database**<br>
+  . **Handles pagination automatically**<br>
+  . **Rate-limited to comply with API restrictions**
+
+<div>
+  <img src="https://img.shields.io/badge/API_Version-v1.0-28a745?style=flat&logo=namecheap&logoColor=white" alt="DNSDumpster API">
+</div>
+
+**DNSDumpster Integration**
+  1. **Get your API key from [DNSDumpster](https://dnsdumpster.com/)**
+  2. **Use with `-dn` flag:**
+```bash
+subfors -d target.com -dn YOUR_API_KEY
+```
+  . **Retrieves DNS records including historical data**<br>
+  . **Processes A records for subdomains**
+
+
+# Output Example 
 
 ```text
-[*] Starting SubFors scan for example.com
-[+] Found 23 unique subdomains
+[•] Starting SubFors v0.2 scan for example.com
+[✓] VirusTotal API connected (Quota: 498/500)
+[•] Running 11 discovery modules...
 
-┌──────────────────────┬──────────────────────────┐
-│      SUBDOMAIN       │        SOURCE            │
-├──────────────────────┼──────────────────────────┤
-│ admin.example.com    │ Certificate Transparency │
-│ beta.example.com     │ Google Dork              │
-│ dev.example.com      │ Brute Force              │
-└──────────────────────┴──────────────────────────┘
+[+] admin.example.com       (Certificate Transparency)
+[+] api.dev.example.com     (VirusTotal)
+[+] legacy.example.com      (DNSDumpster)
+[+] beta.example.com        (Web Archives)
+
+[✓] Scan completed in 2m18s
+[✓] Found 560 unique subdomains
+[✓] JSON results saved to: results.json
+
 ```
 
-# Comparison 📊
+# Comparison 
 
 | Feature        | SubFors | SubFinder | AssetFinder |
 |---------------|---------|-----------|-------------|
-| Multi-engine  | ✅      | ✅        | ❌          |
+| API Integrations  | ✅ (VT+DNS)     | ❌        | ❌          |
+| Multi-engine  | ✅ (11)     | ✅ (8)       | ❌          |
 | CT Logs       | ✅      | ✅        | ✅          |
 | Web Archives  | ✅      | ❌        | ❌          |
 | JS Analysis   | ✅      | ❌        | ❌          |
 | Rate Limiting | ✅      | ❌        | ❌          |
 | Bulk Processing | ✅    | ✅        | ❌          |
 
-## Contribution 🤝
+## Contribution 
 
 1. **Fork the repository**  
 
