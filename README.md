@@ -81,7 +81,7 @@ subfors -dL domains.txt -w custom_wordlist.txt -oX results.xml
 | `-dL`     | File containing domains           | `-dL domains.txt`     |
 | `-vt`     | VirusTotal API key                | `-vt abc123def456`    |
 | `-dn`     | DNSDumpster API key               | `-dn xyz789uvw012`    |
-| `-dn`     | GitHub Personal Access Token      | `-gt ghp_abcd1234xyz` |
+| `-gt`     | GitHub Personal Access Token      | `-gt ghp_abcd1234xyz` |
 | `-w`      | Custom wordlist path              | `-w wordlist.txt`     |
 | `-o`      | Text output file                  | `-o results.txt`      |
 | `-oJ`     | JSON output file                  | `-oJ results.json`    |
