@@ -6,16 +6,17 @@
 
 [![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org/dl/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![API Ready](https://img.shields.io/badge/API%20Integrations-VirusTotal%2FDNSDumpster-orange)]()
+[![API Ready](https://img.shields.io/badge/API%20Integrations-VirusTotal%2FDNSDumpster%2FGitHub-orange)]()
 
 ## Features 
 
-- **Multi-engine enumeration** (11 discovery methods)
-- **API integrations** (VirusTotal, DNSDumpster)
+- **Multi-engine enumeration** (12 discovery methods)
+- **API integrations** (VirusTotal, DNSDumpster, GitHub)
 - **Certificate Transparency** monitoring
 - **Brute-force** with custom wordlists
 - **Web Archives** analysis
 - **JavaScript** file scanning
+- **GitHub subdomain extraction**
 - **Smart rate-limiting** to avoid detection
 - **Multiple output formats** (TXT/JSON/XML)
 - **Bulk domain processing**
@@ -50,17 +51,15 @@ subfors -d example.com
 subfors -d example.com \
   -vt YOUR_VIRUSTOTAL_API_KEY \
   -dn YOUR_DNSDUMPSTER_API_KEY \
+  -gt YOUR_GITHUB_TOKEN \
   -oJ results.json
 
-subfors -dL Scope.txt \
-  -vt YOUR_VIRUSTOTAL_API_KEY \
-  -dn YOUR_DNSDUMPSTER_API_KEY \
-  -oJ results.json
 
 subfors -dL Scope.txt \
   -w custom_wordlist.txt \
   -vt YOUR_VIRUSTOTAL_API_KEY \
   -dn YOUR_DNSDUMPSTER_API_KEY \
+  -gt YOUR_GITHUB_TOKEN \
   -oJ results.json
 
 subfors -dL Scope.txt \
@@ -82,6 +81,7 @@ subfors -dL domains.txt -w custom_wordlist.txt -oX results.xml
 | `-dL`     | File containing domains           | `-dL domains.txt`     |
 | `-vt`     | VirusTotal API key                | `-vt abc123def456`    |
 | `-dn`     | DNSDumpster API key               | `-dn xyz789uvw012`    |
+| `-dn`     | GitHub Personal Access Token      | `-gt ghp_abcd1234xyz` |
 | `-w`      | Custom wordlist path              | `-w wordlist.txt`     |
 | `-o`      | Text output file                  | `-o results.txt`      |
 | `-oJ`     | JSON output file                  | `-oJ results.json`    |
@@ -117,22 +117,37 @@ subfors -d target.com -dn YOUR_API_KEY
   . **Retrieves DNS records including historical data**<br>
   . **Processes A records for subdomains**
 
+<div> <img src="https://img.shields.io/badge/API_Version-v1.0-6e5494?style=flat&logo=github&logoColor=white" alt="GitHub API"> </div>
+
+**GitHub Integration**
+  1. **Get your API key from [GitHub Personal Access Token](https://github.com/settings/tokens)**
+  2. **Use with `-gt` flag:**
+```bash
+subfors -d target.com -gt YOUR_GITHUB_TOKEN
+```
+  . **Searches public code and repositories for subdomains**<br>
+  . **Extracts leaked endpoints and configs containing domains**<br>
+  . **Avoids GitHub rate-limits using your token**
+
 
 # Output Example 
 
 ```text
 [•] Starting SubFors v0.2 scan for example.com
 [✓] VirusTotal API connected (Quota: 498/500)
-[•] Running 11 discovery modules...
+[✓] GitHub token authenticated
+[•] Running 12 discovery modules...
 
 [+] admin.example.com       (Certificate Transparency)
 [+] api.dev.example.com     (VirusTotal)
+[+] devops.example.com      (GitHub)
 [+] legacy.example.com      (DNSDumpster)
 [+] beta.example.com        (Web Archives)
 
 [✓] Scan completed in 2m18s
-[✓] Found 560 unique subdomains
+[✓] Found 612 unique subdomains
 [✓] JSON results saved to: results.json
+
 
 ```
 
@@ -145,6 +160,7 @@ subfors -d target.com -dn YOUR_API_KEY
 | CT Logs       | ✅      | ✅        | ✅          |
 | Web Archives  | ✅      | ❌        | ❌          |
 | JS Analysis   | ✅      | ❌        | ❌          |
+| GitHub Leaks   | ✅      | ❌        | ❌          |
 | Rate Limiting | ✅      | ❌        | ❌          |
 | Bulk Processing | ✅    | ✅        | ❌          |
 

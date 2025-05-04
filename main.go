@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"github.com/saad-ayady/SubFors/banner"
-	"github.com/saad-ayady/SubFors/core" 
-	"github.com/saad-ayady/SubFors/output"
 	"sync"
 	"time"
+	
+	"github.com/saad-ayady/SubFors/banner"
+	"github.com/saad-ayady/SubFors/core"
+	"github.com/saad-ayady/SubFors/output"
 )
 
 var (
@@ -23,6 +24,7 @@ var (
 	domainList  string
 	vtAPIKey    string
 	dnAPIKey    string
+	githubToken string
 )
 
 func init() {
@@ -34,6 +36,7 @@ func init() {
 	flag.StringVar(&domainList, "dL", "", "Path to file containing list of domains")
 	flag.StringVar(&vtAPIKey, "vt", "", "VirusTotal API key (optional)")
 	flag.StringVar(&dnAPIKey, "dn", "", "DNSDumpster API key (optional)")
+	flag.StringVar(&githubToken, "gt", "", "GitHub API token (enables code search)")
 	
 	flag.Usage = func() {
 		banner.PrintBanner()
@@ -44,6 +47,7 @@ func init() {
 		fmt.Println("\nAPI Modules:")
 		fmt.Println("  -vt string   VirusTotal API key (enables VT subdomain lookup)")
 		fmt.Println("  -dn string   DNSDumpster API key (enables DNSDumpster lookup)")
+		fmt.Println("  -gt string   GitHub API token (enables GitHub code search)")
 		fmt.Println("\nScan Techniques:")
 		fmt.Println("  - Brute Force")
 		fmt.Println("  - Certificate Transparency")
@@ -51,11 +55,12 @@ func init() {
 		fmt.Println("  - Favicon Hash Matching")
 		fmt.Println("  - Search Engine Dorking")
 		fmt.Println("  - JavaScript Analysis")
+		fmt.Println("  - GitHub Code Search")
 		fmt.Println("\nExamples:")
 		fmt.Println("  Basic scan:")
 		fmt.Println("    subfors -d example.com -o results.txt")
 		fmt.Println("  Full scan with APIs:")
-		fmt.Println("    subfors -d example.com -vt YOUR_VT_KEY -dn YOUR_DNS_KEY -oJ results.json")
+		fmt.Println("    subfors -d example.com -vt YOUR_VT_KEY -dn YOUR_DNS_KEY -gt YOUR_GH_TOKEN -oJ results.json")
 		fmt.Println("  Domain list scan:")
 		fmt.Println("    subfors -dL domains.txt -w custom_wordlist.txt -oX results.xml")
 	}
@@ -83,7 +88,6 @@ func processDomain(domain string) {
 	startTime := time.Now()
 	fmt.Printf("\n[•] Starting scan for %s\n", domain)
 
-	// Configure all available search methods
 	searchers := []struct {
 		name   string
 		search func(string) ([]string, error)
@@ -112,15 +116,19 @@ func processDomain(domain string) {
 			}
 			return core.GetSubsFromDNSDumpster(d, dnAPIKey)
 		}},
+		{"GitHub Code Search", func(d string) ([]string, error) {
+			if githubToken == "" {
+				return nil, nil
+			}
+			return core.GetSubsFromGitHub(d, githubToken)
+		}},
 	}
 
-	// Processing setup
 	results := make(chan string, 1000)
 	uniqueSubs := sync.Map{}
 	var wg sync.WaitGroup
 	var resultsWg sync.WaitGroup
 
-	// Results collector
 	resultsWg.Add(1)
 	go func() {
 		defer resultsWg.Done()
@@ -130,7 +138,6 @@ func processDomain(domain string) {
 		}
 	}()
 
-	// Run all scanners with rate limiting
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
@@ -172,19 +179,16 @@ func processDomain(domain string) {
 	close(results)
 	resultsWg.Wait()
 
-	// Convert results to slice
 	var subdomains []string
 	uniqueSubs.Range(func(key, value interface{}) bool {
 		subdomains = append(subdomains, key.(string))
 		return true
 	})
 
-	// Final output
 	elapsed := time.Since(startTime).Round(time.Second)
 	fmt.Printf("\n[✓] Scan completed in %s\n", elapsed)
 	fmt.Printf("[✓] Found %d unique subdomains\n", len(subdomains))
 
-	// Save results if any output path specified
 	saveResults(domain, subdomains)
 }
 
@@ -202,7 +206,7 @@ func processDomainList(listPath string) {
 		if domain != "" {
 			fmt.Printf("\n=== Processing domain: %s ===\n", domain)
 			processDomain(domain)
-			time.Sleep(2 * time.Second) // Rate limit between domains
+			time.Sleep(2 * time.Second)
 		}
 	}
 }
