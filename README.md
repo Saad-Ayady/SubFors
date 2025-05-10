@@ -1,8 +1,10 @@
 # SubFors 
 
-![SubFors Banner](./images/pic.png)
+![SubFors Logo](./images/logo.jpg)
 
 **SubFors** is a fast, modular subdomain discovery tool that combines multiple enumeration techniques to uncover hidden attack surfaces. Now with **API integrations** for enhanced reconnaissance.
+
+![SubFors Banner](./images/pic.png)
 
 [![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org/dl/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
